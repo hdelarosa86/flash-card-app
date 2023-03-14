@@ -7,30 +7,31 @@ current_word = ()
 
 #DATA
 french_words_df = pandas.read_csv('./data/french_words.csv')
-french_words_list = french_words_df.to_dict(orient='records')
+words_to_learn = french_words_df.to_dict(orient='records')
+
+# FUNCTIONS
 
 
 def flip_card():
-    canvas.itemconfig(language, text=current_word[0][1], fill='white')
-    canvas.itemconfig(word, text=current_word[1][1], fill='white')
+    canvas.itemconfig(language, text='English', fill='white')
+    canvas.itemconfig(word, text=current_word['English'], fill='white')
     canvas.itemconfig(canvas_image, image=card_back)
-
-
-def random_word():
-    new_word = random.choice(french_words_list)
-    keys = list(new_word.keys())
-    values = list(new_word.values())
-    return keys, values
 
 
 def get_new_word():
     global current_word, flip_timer
+
     window.after_cancel(flip_timer)
-    current_word = random_word()
+    current_word = random.choice(words_to_learn)
     canvas.itemconfig(canvas_image, image=card_front)
-    canvas.itemconfig(word, text=current_word[1][0], fill='black')
-    canvas.itemconfig(language, text=current_word[0][0], fill='black')
+    canvas.itemconfig(word, text=current_word['French'], fill='black')
+    canvas.itemconfig(language, text='French', fill='black')
     flip_timer = window.after(3000, flip_card)
+
+
+def is_known():
+    words_to_learn.remove(current_word)
+    get_new_word()
 
 
 # WINDOW
@@ -53,7 +54,8 @@ language = canvas.create_text(400, 150, text='', font=('Ariel', 40, 'italic'))
 word = canvas.create_text(400, 263, text='', font=('Ariel', 60, 'bold'))
 canvas.grid(column=0, row=0, columnspan=2)
 
-right_button = Button(image=right_img, borderwidth=0, command=get_new_word)
+# BUTTONS
+right_button = Button(image=right_img, borderwidth=0, command=is_known)
 right_button.grid(column=1, row=1, padx=50)
 wrong_button = Button(image=wrong_img, borderwidth=0, command=get_new_word)
 wrong_button.grid(column=0, row=1, padx=50)
