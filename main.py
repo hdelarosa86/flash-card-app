@@ -3,11 +3,19 @@ import pandas
 import random
 
 BACKGROUND_COLOR = "#B1DDC6"
-current_word = ()
+current_word = {}
 
 #DATA
-french_words_df = pandas.read_csv('./data/french_words.csv')
-words_to_learn = french_words_df.to_dict(orient='records')
+
+try:
+    with open('./data/words_to_learn.csv', 'r') as data_file:
+        data = pandas.read_csv(data_file)
+except FileNotFoundError:
+    data_df = pandas.read_csv('./data/french_words.csv')
+    words_to_learn = data_df.to_dict(orient='records')
+else:
+    words_to_learn = data.to_dict(orient='records')
+
 
 # FUNCTIONS
 
@@ -31,6 +39,8 @@ def get_new_word():
 
 def is_known():
     words_to_learn.remove(current_word)
+    new_data_df = pandas.DataFrame(words_to_learn)
+    new_data_df.to_csv('./data/words_to_learn.csv', index=False)
     get_new_word()
 
 
